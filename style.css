@@ -320,11 +320,13 @@ body {
     display: block;
 }
 
-.intro-nav {
+/* Oculta os botões de navegação padrão da intro */
+.intro-nav-controls { 
     display: flex;
     justify-content: space-between;
     width: 100%;
     margin-top: 30px;
+    /* Adicionado flex para controle, mas os botões individuais serão escondidos via JS ou display: none diretamente */
 }
 
 .intro-nav-btn {

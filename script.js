@@ -158,7 +158,7 @@ let completedLevels = [];
 let playerName = "Aventureiro";
 let playerGender = "";
 let playerAvatar = "";
-let currentIntroPage = 1;
+let currentIntroPage = 1; 
 let playerLives = 3;
 let playerCoins = 0;
 let currentAttempts = 3; 
@@ -195,28 +195,37 @@ const livesCountDisplay = document.getElementById('lives-count');
 const coinsCountDisplay = document.getElementById('coins-count');
 const buyLifeBtn = document.getElementById('buy-life-btn');
 
+// NOVO: Referência ao botão de iniciar enigmas (na última página da introdução)
+const startEnigmasBtn = document.getElementById('start-enigmas-btn');
+
+
 // Inicializar o jogo
 function initGame() {
     const hasSeenIntro = localStorage.getItem('hasSeenIntro');
+    
     if (hasSeenIntro === 'true') {
-        introScreen.style.display = 'none';
-        loadGameState();
-        // Se a introdução já foi vista e o jogo foi salvo, tenta carregar o último enigma.
-        // Se currentLevel for 10 e completedLevels for 10, o botão "Próximo Enigma" se transformará em "Ver Tesouro Final".
+        // Se a introdução já foi vista e o jogo foi salvo, tenta carregar.
+        introScreen.style.display = 'none'; // Esconde a introdução.
+        loadGameState(); // Carrega o estado do jogo.
+        // Se o jogo carregado estiver completo, pode levar ao modal de vitória.
+        // Caso contrário, mostra o enigma em que o jogador parou.
         showEnigma(currentLevel); 
     } else {
-        // Se for a primeira vez (ou se o localStorage foi limpo), mostra a introdução e reseta as variáveis do jogo.
+        // Se for a primeira vez (ou se o localStorage foi limpo),
+        // reinicia as variáveis e mostra a página de criação de personagem.
         introScreen.style.display = 'flex';
-        goToIntroPage(1);
-        resetGameVariables(); // Garante que as variáveis em memória estejam limpas para uma nova aventura.
+        goToIntroPage(1); // Vai para a página 1 (criação de personagem)
+        resetGameVariables(); // Garante que as variáveis em memória estejam limpas.
     }
     
     // Configurar eventos dos botões de navegação da introdução
+    // Botões "Anterior" e "Próximo" agora serão controlados dinamicamente via JS
     prevBtn.addEventListener('click', function() {
         navigateIntroPage(-1);
     });
     
     nextBtn.addEventListener('click', function() {
+        // Apenas avança as páginas da introdução, sem lógica de início de jogo aqui
         navigateIntroPage(1);
     });
     
@@ -237,38 +246,46 @@ function initGame() {
             this.classList.add('selected');
             playerGender = this.getAttribute('data-gender');
             populateAvatars(playerGender);
-            checkFormCompletion();
+            checkFormCompletion(); // Revalida o botão "Iniciar Aventura"
         });
     });
     
-    // Lógica do botão "Iniciar Aventura"
+    // Lógica do botão "Iniciar Aventura" (agora ele direciona para a introdução)
     startAdventureBtn.addEventListener('click', function() {
         const name = playerNameInput.value.trim();
-        // Garante que o nome esteja preenchido
-        if (!name) {
-            alert("Por favor, digite seu nome, aventureiro!");
-            return; 
+        // Garante que o nome, gênero e avatar foram preenchidos
+        if (!name || !playerGender || !playerAvatar) {
+            alert("Por favor, preencha todos os dados do seu personagem para iniciar a aventura!");
+            return;
         }
-        // Atribui o nome ANTES do reset de variáveis para que não seja sobrescrito.
+        
+        // Define o nome, gênero e avatar DO JOGADOR. Não resetamos o jogo aqui, só coletamos os dados do personagem.
         playerName = name; 
+        // playerGender e playerAvatar já estão definidos pelos event listeners de seleção.
+        
+        saveGameState(); // Salva os dados do personagem (nome, gênero, avatar).
+        localStorage.setItem('hasSeenIntro', 'true'); // Marca que a introdução foi vista (para futuras visitas).
+        
+        // Agora, em vez de ir para o enigma, ele vai para a primeira página da introdução (nova página 2).
+        introScreen.style.display = 'flex'; // Garante que a tela de introdução esteja visível
+        goToIntroPage(2); // Leva para a nova página 2 (antiga página 1 da introdução)
+    });
 
-        // --- REINICIALIZAÇÃO EXPLÍCITA E COMPLETA DO ESTADO DO JOGO PARA UMA NOVA AVENTURA ---
-        // Isso garante que, ao iniciar uma NOVA aventura, o jogo sempre comece do zero,
-        // limpando qualquer estado anterior que possa ter sido carregado ou restado de alguma forma.
+    // NOVO: Listener para o botão que inicia os enigmas após a introdução (na última página da introdução)
+    startEnigmasBtn.addEventListener('click', function() {
+        // Reinicializa o estado do jogo para começar os enigmas (garantindo um jogo NOVO)
         currentLevel = 1;
-        completedLevels = []; 
+        completedLevels = [];
         playerLives = 3;
         playerCoins = 0;
-        enigmaAttempts = {}; // Resetar tentativas por enigma também
-        // --- FIM DA REINICIALIZAÇÃO ---
+        enigmaAttempts = {}; 
         
-        saveGameState(); // Salva este NOVO estado (começando do zero)
-        localStorage.setItem('hasSeenIntro', 'true'); // Marca que a introdução foi vista para futuras visitas
+        saveGameState(); // Salva este estado inicial do jogo
         introScreen.style.display = 'none'; // Esconde a tela de introdução
-        showEnigma(1); // Inicia sempre no PRIMEIRO enigma
+        showEnigma(1); // Inicia no PRIMEIRO enigma
     });
-    
-    // Configurar eventos para navegação entre enigmas
+
+    // Configurar eventos para navegação entre enigmas (unchanged)
     prevEnigmaBtn.addEventListener('click', function() {
         if (currentLevel > 1) {
             showEnigma(currentLevel - 1);
@@ -285,14 +302,13 @@ function initGame() {
     
     // Configurar evento para reiniciar o jogo (a partir do modal de vitória ou game over)
     restartBtn.addEventListener('click', function() {
-        resetGameAndGoToIntro(); // Nova função para resetar e ir para a intro
+        resetGameAndGoToIntro(); // Função para resetar e ir para a intro
         victoryModal.style.display = 'none';
     });
     
     // Configurar evento para tentar novamente após game over
-    // CORREÇÃO: Certifique-se de que a função chamada está correta: resetGameAndGoToIntro
     tryAgainBtn.addEventListener('click', function() {
-        resetGameAndGoToIntro(); // Chamada corrigida
+        resetGameAndGoToIntro(); // Chamada CORRIGIDA!
         gameOverModal.style.display = 'none';
     });
     
@@ -320,41 +336,68 @@ function initGame() {
 
 // Navegar entre páginas da introdução
 function navigateIntroPage(direction) {
+    const totalIntroPages = 4; // Total de páginas da introdução (criação de personagem + 3 de história)
     const newPage = currentIntroPage + direction;
-    if (newPage >= 1 && newPage <= 4) {
+
+    if (newPage >= 1 && newPage <= totalIntroPages) {
+        // Lógica de validação para avançar da página de criação de personagem (página 1)
+        if (currentIntroPage === 1 && direction === 1) { 
+            const name = playerNameInput.value.trim();
+            if (!name || !playerGender || !playerAvatar) { // Garante que todos os dados foram preenchidos
+                alert("Por favor, preencha todos os dados do seu personagem para continuar!");
+                return; // Impede a navegação
+            }
+            // Não precisa salvar o estado aqui, pois o "Iniciar Aventura" já o faz ou será feito ao ir para o enigma.
+        }
         goToIntroPage(newPage);
     }
 }
 
 // Ir para uma página específica da introdução
 function goToIntroPage(page) {
-    // Esconder todas as páginas
     document.querySelectorAll('.intro-page').forEach(p => {
         p.classList.remove('active');
     });
     
-    // Mostrar a página selecionada
     document.getElementById(`intro-page-${page}`).classList.add('active');
     
-    // Atualizar os pontos de paginação
     document.querySelectorAll('.intro-pagination-dot').forEach(dot => {
         dot.classList.remove('active');
     });
     document.querySelector(`.intro-pagination-dot[data-page="${page}"]`).classList.add('active');
     
-    // Desabilitar o botão "Próximo" na última página (criação de personagem)
-    // para que o jogador use apenas o botão "Iniciar Aventura"
-    prevBtn.disabled = (page === 1);
-    nextBtn.disabled = (page === 4); // Desabilita o "Próximo" na página 4
-    
-    // Se estiver na página de criação de personagem, habilita/desabilita o botão "Iniciar Aventura"
-    if (page === 4) {
-        checkFormCompletion();
-    } else {
-        startAdventureBtn.disabled = true; // Desabilita o botão em outras páginas
+    // Controle de visibilidade dos botões "Anterior" e "Próximo"
+    if (page === 1) { // Página de criação de personagem
+        prevBtn.style.display = 'none'; // Esconde "Anterior"
+        nextBtn.style.display = 'none'; // Esconde "Próximo"
+        startAdventureBtn.style.display = 'block'; // Mostra "Iniciar Aventura"
+    } else { // Páginas da introdução (história)
+        prevBtn.style.display = 'block'; // Mostra "Anterior"
+        nextBtn.style.display = 'block'; // Mostra "Próximo"
+        startAdventureBtn.style.display = 'none'; // Esconde "Iniciar Aventura"
     }
 
-    // Atualizar a página atual
+    prevBtn.disabled = (page === 1); // Desabilita "Anterior" na primeira página
+    
+    // Se for a última página da introdução (página 4), o botão "Próximo" é desabilitado
+    // e o "Iniciar Enigmas!" aparece.
+    if (page === 4) {
+        nextBtn.style.display = 'none'; // Esconde "Próximo"
+        if (startEnigmasBtn) {
+            startEnigmasBtn.style.display = 'block'; // Mostra "Iniciar Enigmas!"
+        }
+    } else {
+        if (startEnigmasBtn) {
+            startEnigmasBtn.style.display = 'none'; // Esconde "Iniciar Enigmas!"
+        }
+    }
+
+
+    // Revalida o botão "Iniciar Aventura" caso esteja na página 1.
+    if (page === 1) {
+        checkFormCompletion();
+    }
+    
     currentIntroPage = page;
 }
 
@@ -386,7 +429,7 @@ function populateAvatars(gender) {
     });
 
     // Se um avatar já estiver selecionado (ex: ao carregar jogo salvo), marque-o
-    if (playerGender && playerAvatar) { // Simplificado: verifica se playerAvatar existe
+    if (playerGender && playerAvatar) {
         const currentAvatarDiv = document.querySelector(`.avatar-option[data-avatar="${playerAvatar}"]`);
         if (currentAvatarDiv) {
             currentAvatarDiv.classList.add('selected');
@@ -394,7 +437,7 @@ function populateAvatars(gender) {
     }
 }
 
-// Verificar se o formulário está completo para habilitar o botão de iniciar
+// Verificar se o formulário está completo para habilitar o botão de iniciar aventura
 function checkFormCompletion() {
     const name = playerNameInput.value.trim();
     const selectedGender = document.querySelector('.gender-option.selected');
@@ -585,9 +628,16 @@ function resetGameVariables() {
     playerNameInput.value = '';
     document.querySelectorAll('.gender-option').forEach(opt => opt.classList.remove('selected'));
     avatarSelection.innerHTML = ''; // Limpa os avatares selecionados
-    startAdventureBtn.disabled = true;
+    startAdventureBtn.disabled = true; // Desabilita o botão "Iniciar Aventura"
     updateResourcesDisplay();
     updateProgress();
+    // Garante que o botão de iniciar enigmas não esteja visível/ativo se não deveria
+    if (startEnigmasBtn) {
+        startEnigmasBtn.style.display = 'none';
+    }
+    // Garante que os botões "Anterior"/"Próximo" da intro estejam escondidos inicialmente.
+    prevBtn.style.display = 'none';
+    nextBtn.style.display = 'none';
 }
 
 // Função para resetar o jogo e ir para a tela de introdução (usada pelos botões de restart/try again)
@@ -596,7 +646,7 @@ function resetGameAndGoToIntro() {
     localStorage.clear(); // Limpa o localStorage para um reset manual completo (como se fechasse a janela)
     localStorage.setItem('hasSeenIntro', 'false'); // Garante que a introdução seja mostrada novamente
     introScreen.style.display = 'flex'; 
-    goToIntroPage(1); 
+    goToIntroPage(1); // Leva para a página 1 (criação de personagem)
 }
 
 // Salvar estado do jogo no Local Storage
@@ -623,29 +673,31 @@ function loadGameState() {
         currentLevel = gameState.currentLevel || 1;
         completedLevels = gameState.completedLevels || [];
         playerName = gameState.playerName || "Aventureiro";
-        playerGender = gameState.playerGender || "";
-        playerAvatar = gameState.playerAvatar || "";
+        playerGender = gameState.playerGender || ""; 
+        playerAvatar = gameState.playerAvatar || "";   
         playerLives = gameState.playerLives !== undefined ? gameState.playerLives : 3;
         playerCoins = gameState.playerCoins !== undefined ? gameState.playerCoins : 0;
         
         // Atualizar elementos da UI com o estado carregado
         playerNameDisplay.textContent = playerName;
         playerLevelDisplay.textContent = currentLevel;
-        updatePlayerAvatar();
+        updatePlayerAvatar(); 
         updateResourcesDisplay();
         updateProgress();
 
-        // Se houver gênero salvo, repopula avatares e marca o selecionado
+        // No load, se tiver gênero salvo, repopula avatares e marca o selecionado
+        // Isso é importante para que a seleção visual seja restaurada na página de criação de personagem
+        // caso o usuário volte para lá antes de iniciar o jogo.
         if (playerGender) {
-            // Seleciona a opção de gênero
-            document.querySelectorAll('.gender-option').forEach(opt => {
-                if (opt.getAttribute('data-gender') === playerGender) {
-                    opt.classList.add('selected');
-                } else {
-                    opt.classList.remove('selected');
-                }
-            });
-            populateAvatars(playerGender); // Isso irá recriar os avatares e marcar o salvo
+            populateAvatars(playerGender);
+            const currentGenderOption = document.querySelector(`.gender-option[data-gender="${playerGender}"]`);
+            if (currentGenderOption) {
+                currentGenderOption.classList.add('selected');
+            }
+            const currentAvatarDiv = document.querySelector(`.avatar-option[data-avatar="${playerAvatar}"]`);
+            if (currentAvatarDiv) {
+                currentAvatarDiv.classList.add('selected');
+            }
         }
     } else {
        // Se não houver estado salvo, reinicia as variáveis para o estado inicial
