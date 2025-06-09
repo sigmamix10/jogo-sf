@@ -1111,10 +1111,10 @@
                  loadGameState();
                  showEnigma(currentLevel);
              } else {
-                 // Se for a primeira vez ou reset forçado, mostra a introdução e reseta o jogo
+                 // Se for a primeira vez, mostra a introdução e reseta o jogo
                  introScreen.style.display = 'flex';
                  goToIntroPage(1);
-                 resetGameVariables(); // Reseta apenas as variáveis, sem limpar o localStorage aqui
+                 resetGameVariables(); // Reseta apenas as variáveis em memória
              }
              
              // Configurar eventos dos botões de navegação da introdução
@@ -1157,7 +1157,7 @@
                  saveGameState(); // Voltamos a salvar o estado
                  localStorage.setItem('hasSeenIntro', 'true'); // Marca que a introdução foi vista
                  introScreen.style.display = 'none';
-                 showEnigma(currentLevel);
+                 showEnigma(1); // MUDANÇA CRÍTICA: Sempre iniciar no Enigma 1 após a criação do personagem
              });
              
              // Configurar eventos para navegação entre enigmas
@@ -1233,9 +1233,10 @@
              });
              document.querySelector(`.intro-pagination-dot[data-page="${page}"]`).classList.add('active');
              
-             // Atualizar os botões de navegação
+             // MUDANÇA CRÍTICA AQUI: Desabilitar o botão "Próximo" na última página (criação de personagem)
+             // para que o jogador use apenas o botão "Iniciar Aventura"
              prevBtn.disabled = (page === 1);
-             nextBtn.disabled = (page === 4);
+             nextBtn.disabled = (page === 4); // Desabilita o "Próximo" na página 4
              
              // Se estiver na página de criação de personagem, habilita/desabilita o botão "Iniciar Aventura"
              if (page === 4) {
