@@ -663,7 +663,10 @@
      </style>
  </head>
  <body>
-     <div id="intro-screen" class="intro-screen forest-bg-pattern"> <div class="intro-content">
+     <!-- Tela de Introdução -->
+     <div id="intro-screen" class="intro-screen forest-bg-pattern"> <!-- Usando a nova classe para o padrão -->
+         <div class="intro-content">
+             <!-- Decorações -->
              <div class="intro-decoration top-left">
                  <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                      <path d="M50 0L60 40H40L50 0Z" fill="#8B4513" />
@@ -688,6 +691,7 @@
              </div>
              
              <div class="intro-scroll">
+                 <!-- Página 1 -->
                  <div id="intro-page-1" class="intro-page active">
                      <h1 class="intro-title">As Aventuras nas Terras Encantadas da Sequência Fedathi</h1>
                      <p class="intro-text">
@@ -701,6 +705,7 @@
                      </p>
                  </div>
                  
+                 <!-- Página 2 -->
                  <div id="intro-page-2" class="intro-page">
                      <h1 class="intro-title">A Lenda da Sequência Fedathi</h1>
                      <p class="intro-text">
@@ -711,6 +716,7 @@
                      </p>
                  </div>
                  
+                 <!-- Página 3 -->
                  <div id="intro-page-3" class="intro-page">
                      <h1 class="intro-title">Sua Missão</h1>
                      <p class="intro-text">
@@ -724,6 +730,7 @@
                      </p>
                  </div>
                  
+                 <!-- Página 4: Criação de Personagem -->
                  <div id="intro-page-4" class="intro-page">
                      <h1 class="intro-title">Crie Seu Personagem</h1>
                      <div class="intro-form">
@@ -737,17 +744,20 @@
                          
                          <p class="text-lg font-bold text-amber-900 mt-4 mb-2">Escolha seu avatar:</p>
                          <div class="avatar-selection">
-                             </div>
+                             <!-- Os avatares serão preenchidos dinamicamente com base no gênero -->
+                         </div>
                          
                          <button id="start-adventure-btn" class="btn mt-6" disabled>Iniciar Aventura</button>
                      </div>
                  </div>
                  
+                 <!-- Navegação entre páginas -->
                  <div class="intro-nav">
                      <button id="prev-btn" class="intro-nav-btn" disabled>Anterior</button>
                      <button id="next-btn" class="intro-nav-btn">Próximo</button>
                  </div>
                  
+                 <!-- Paginação -->
                  <div class="intro-pagination">
                      <div class="intro-pagination-dot active" data-page="1"></div>
                      <div class="intro-pagination-dot" data-page="2"></div>
@@ -781,19 +791,23 @@
          </div>
      </div>
  
-     <div class="container mx-auto px-4 py-8 game-outer-wrapper forest-bg-pattern"> <h1 class="text-4xl font-bold text-center text-white mb-2 medieval-title">As Aventuras nas Terras Encantadas</h1>
+     <!-- Tela principal do jogo -->
+     <div class="container mx-auto px-4 py-8 game-outer-wrapper forest-bg-pattern"> <!-- Novo wrapper para o fundo da área do jogo -->
+         <h1 class="text-4xl font-bold text-center text-white mb-2 medieval-title">As Aventuras nas Terras Encantadas</h1>
          <h2 class="text-3xl font-bold text-center text-white mb-8 medieval-title">da Sequência Fedathi</h2>
          
          <div class="game-container">
              <div class="player-info">
                  <div id="player-avatar" class="player-avatar">
-                     </div>
+                     <!-- Avatar será inserido aqui -->
+                 </div>
                  <div>
                      <h3 id="player-name-display" class="text-xl font-bold text-amber-900">Aventureiro</h3>
                      <p class="text-amber-800">Nível: <span id="player-level">1</span></p>
                  </div>
              </div>
              
+             <!-- Recursos do jogador: vidas e moedas -->
              <div class="resources-container">
                  <div class="lives-container">
                      <div class="resource-icon">
@@ -826,7 +840,8 @@
                  <p id="enigma-text" class="text-lg text-amber-900 mb-6 leading-relaxed">Texto do enigma aqui.</p>
                  
                  <div id="options-container">
-                     </div>
+                     <!-- Opções serão inseridas aqui -->
+                 </div>
                  
                  <div id="feedback-correct" class="feedback correct">
                      <p class="font-bold text-green-800">Correto!</p>
@@ -846,10 +861,12 @@
              </div>
          </div>
          
+         <!-- Rodapé -->
          <footer class="footer">
              <p>Desenvolvido por Rogério Alves | Apoio G-TERCOA</p>
          </footer>
          
+         <!-- Modal de vitória -->
          <div id="victory-modal" class="modal">
              <div class="modal-content victory-modal">
                  <h2 class="medieval-title">Parabéns, Aventureiro!</h2>
@@ -864,6 +881,7 @@
                      <div class="seal">✓</div>
                  </div>
                  
+                 <!-- Prêmio final -->
                  <div class="treasure-container">
                      <h3 class="treasure-title">Você conquistou:</h3>
                      <div class="treasure-image">
@@ -891,6 +909,7 @@
              </div>
          </div>
          
+         <!-- Modal de Game Over -->
          <div id="game-over-modal" class="modal">
              <div class="modal-content game-over-modal">
                  <h2 class="medieval-title">Fim da Jornada</h2>
@@ -898,7 +917,7 @@
                  <p>Mas não desista! Todo grande aventureiro enfrenta desafios e aprende com eles.</p>
                  
                  <div class="mt-6">
-                     <button id="try-again-btn" class="btn">Tentar Novamente</button>
+                     <button id="try-again-btn" class="btn">Tentar novamente</button>
                  </div>
              </div>
          </div>
@@ -1109,7 +1128,7 @@
              if (hasSeenIntro === 'true') {
                  introScreen.style.display = 'none';
                  loadGameState();
-                 showEnigma(currentLevel);
+                 showEnigma(currentLevel); 
              } else {
                  // Se for a primeira vez, mostra a introdução e reseta o jogo
                  introScreen.style.display = 'flex';
@@ -1147,17 +1166,27 @@
                  });
              });
              
-             // Configurar evento para iniciar a aventura
+             // MUDANÇA CRÍTICA AQUI: Lógica do botão "Iniciar Aventura"
              startAdventureBtn.addEventListener('click', function() {
                  const name = playerNameInput.value.trim();
                  if (name) {
                      playerName = name;
                  }
                  
-                 saveGameState(); // Voltamos a salvar o estado
-                 localStorage.setItem('hasSeenIntro', 'true'); // Marca que a introdução foi vista
-                 introScreen.style.display = 'none';
-                 showEnigma(1); // MUDANÇA CRÍTICA: Sempre iniciar no Enigma 1 após a criação do personagem
+                 // --- REINICIALIZAÇÃO EXPLÍCITA E COMPLETA DO ESTADO DO JOGO PARA UMA NOVA AVENTURA ---
+                 // Isso garante que, ao iniciar uma NOVA aventura, o jogo sempre comece do zero,
+                 // limpando qualquer estado anterior que possa ter sido carregado ou restado.
+                 currentLevel = 1;
+                 completedLevels = []; 
+                 playerLives = 3;
+                 playerCoins = 0;
+                 enigmaAttempts = {}; // Resetar tentativas por enigma também
+                 // --- FIM DA REINICIALIZAÇÃO ---
+                 
+                 saveGameState(); // Salva este NOVO estado (começando do zero)
+                 localStorage.setItem('hasSeenIntro', 'true'); // Marca que a introdução foi vista para futuras visitas
+                 introScreen.style.display = 'none'; // Esconde a tela de introdução
+                 showEnigma(1); // Inicia sempre no PRIMEIRO enigma
              });
              
              // Configurar eventos para navegação entre enigmas
